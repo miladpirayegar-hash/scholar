@@ -26,20 +26,33 @@ workflows:
       cancel_previous_builds: true
 
     scripts:
+      - name: Locate Flutter project
+        script: |
+          PROJECT_DIR="$(dirname "$(find . -maxdepth 4 -name pubspec.yaml -print -quit)")"
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "No pubspec.yaml found"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $CM_ENV
+          echo "Detected Flutter project at: $PROJECT_DIR"
+
       - name: Flutter pub get
         script: |
+          cd "$PROJECT_DIR"
           flutter pub get
 
       - name: Set iOS bundle id in project
         script: |
+          cd "$PROJECT_DIR"
           sed -i '' "s/com.example.scholarMobile/$BUNDLE_ID/g" ios/Runner.xcodeproj/project.pbxproj
 
       - name: Build IPA
         script: |
+          cd "$PROJECT_DIR"
           flutter build ipa --release
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - '**/build/ios/ipa/*.ipa'
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
