@@ -8,6 +8,7 @@ workflows:
       flutter: stable
       xcode: latest
       vars:
+        FLUTTER_PROJECT_DIR: scholar_mobile
         BUNDLE_ID: com.miladpirayegarhash.scholar
       ios_signing:
         distribution_type: app_store
@@ -28,18 +29,21 @@ workflows:
     scripts:
       - name: Flutter pub get
         script: |
+          cd "$FLUTTER_PROJECT_DIR"
           flutter pub get
 
       - name: Set iOS bundle id in project
         script: |
+          cd "$FLUTTER_PROJECT_DIR"
           sed -i '' "s/com.example.scholarMobile/$BUNDLE_ID/g" ios/Runner.xcodeproj/project.pbxproj
 
       - name: Build IPA
         script: |
+          cd "$FLUTTER_PROJECT_DIR"
           flutter build ipa --release
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - scholar_mobile/build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
